@@ -5,6 +5,7 @@ Cronet Sample
 is Chromium's Networking stack packaged as a library. This sample app shows how to use the library.
 
 ### Getting Started
+
 ---------------
 1. Clone or download this repository.
 2. Import the project in Android Studio (File &rightarrow; New &rightarrow;
@@ -15,6 +16,18 @@ Import Project) by selecting the top level build.gradle file inside the
 button. Alternatively,
 run "gradlew :app:installDebug" from the command line inside the "android"
 directory.
+
+### test result
+
+适配通过设备，需要跳转至谷歌服务打开
+
+* MI 9
+
+不支持，没有谷歌services
+
+* huawei mate 30
+* 一加
+
 
 
 ### License
@@ -38,3 +51,4 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 ```
+
