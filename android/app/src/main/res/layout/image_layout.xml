@@ -24,6 +24,7 @@
 
     <ImageView
         android:id="@+id/cronet_image"
+        android:layout_gravity="center"
         android:layout_width="@dimen/spacing_medium"
         android:layout_height="@dimen/spacing_medium" />
 </LinearLayout>

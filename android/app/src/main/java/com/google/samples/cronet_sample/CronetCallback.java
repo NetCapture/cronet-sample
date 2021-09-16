@@ -1,5 +1,7 @@
 package com.google.samples.cronet_sample;
 
+import android.util.Log;
+
 import org.chromium.net.CronetException;
 import org.chromium.net.UrlRequest;
 import org.chromium.net.UrlResponseInfo;
@@ -10,9 +12,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
+abstract class CronetCallback extends UrlRequest.Callback {
 
-    private static final String TAG = "ReadToMemoryCronetCallback";
+    private static final String TAG = "sanbo.CronetCallback";
 
     private static final int BYTE_BUFFER_CAPACITY_BYTES = 64 * 1024;
 
@@ -20,7 +22,7 @@ abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
     private final WritableByteChannel receiveChannel = Channels.newChannel(bytesReceived);
     private final long startTimeNanos;
 
-    ReadToMemoryCronetCallback() {
+    CronetCallback() {
         // This is not entirely accurate as the request doesn't start the moment the callback
         // is created, but the events are close enough for the purpose of the test application.
         startTimeNanos = System.nanoTime();
@@ -48,8 +50,7 @@ abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
         // to attempt to start reading the response body.
 
         android.util.Log.i(TAG, "****** Response Started ******");
-        android.util.Log.i(TAG, "*** Headers Are *** " + info.getAllHeaders());
-
+        android.util.Log.i(TAG, "*** Response Started **** Headers:\r\n" + info.getAllHeaders());
         // One must use a *direct* byte buffer when calling the read method.
         request.read(ByteBuffer.allocateDirect(BYTE_BUFFER_CAPACITY_BYTES));
     }
@@ -73,7 +74,7 @@ abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
         try {
             receiveChannel.write(byteBuffer);
         } catch (IOException e) {
-            android.util.Log.i(TAG, "IOException during ByteBuffer read. Details: ", e);
+            android.util.Log.i(TAG, Log.getStackTraceString(e));
         }
         // Reset the buffer to prepare it for the next read
         byteBuffer.clear();
@@ -91,13 +92,9 @@ abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
 
         android.util.Log.i(TAG,
                 "****** Cronet Request Completed, the latency is " + latencyNanos + " nanoseconds" +
-                        ". " + getWasCachedMessage(info));
-
-        android.util.Log.i(TAG,
-                "****** Cronet Negotiated protocol:  " + info.getNegotiatedProtocol());
-
-        android.util.Log.i(TAG,
-                "****** Cronet Request Completed, status code is " + info.getHttpStatusCode()
+                        ". " + getWasCachedMessage(info)
+                        + "\r\n****** Cronet Negotiated protocol:  " + info.getNegotiatedProtocol()
+                        + "\r\n****** Cronet Request Completed, status code is " + info.getHttpStatusCode()
                         + ", total received bytes is " + info.getReceivedByteCount());
 
         byte[] bodyBytes = bytesReceived.toByteArray();
@@ -122,6 +119,6 @@ abstract class ReadToMemoryCronetCallback extends UrlRequest.Callback {
 
     @Override
     public void onFailed(UrlRequest var1, UrlResponseInfo var2, CronetException var3) {
-        android.util.Log.i(TAG, "****** onFailed, error is: " + var3.getMessage());
+        android.util.Log.e(TAG, "****** onFailed, error is: " + var3.getMessage());
     }
 }

@@ -2,6 +2,8 @@ package com.google.samples.cronet_sample;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -21,34 +23,33 @@ import java.util.stream.Collectors;
 
 public class CronetApplication extends Application {
 
+    private static final String TAG = "sanbo.Application";
     // We recommend that each application uses a single, global CronetEngine. This allows Cronet
     // to maximize performance. This can either be achieved using a global static . In this example,
     // we initialize it in an Application class to manage lifecycle of the network log.
     private CronetEngine cronetEngine;
 
-    // Executor that will invoke asynchronous Cronet callbacks. Like with the Cronet engine, we
-    // recommend that it's managed centrally.
-    private ExecutorService cronetCallbackExecutorService;
 
-    // We use this variable to demonstrate how Cronet's caching behaves. Each subsequent attempt to
-    // load the images fetches one more, up to the number of images specified in ImageRepository.
-    // Don't do this in your production application, it's a dirty hack :).
-    public final AtomicInteger imagesToLoadCeiling = new AtomicInteger();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        cronetEngine = createDefaultCronetEngine(this);
-        cronetCallbackExecutorService = Executors.newFixedThreadPool(4);
+        try {
+            createCustomCronetEngine(this);
+        } catch (Throwable e) {
+            Log.e(TAG,Log.getStackTraceString(e));
+        }
+        try {
+            cronetEngine = createDefaultCronetEngine(this);
+        } catch (Throwable e) {
+            Log.e(TAG,Log.getStackTraceString(e));
+        }
     }
 
     public CronetEngine getCronetEngine() {
         return cronetEngine;
     }
 
-    public ExecutorService getCronetCallbackExecutorService() {
-        return cronetCallbackExecutorService;
-    }
 
     private static CronetEngine createDefaultCronetEngine(Context context) {
         // Cronet makes use of modern protocols like HTTP/2 and QUIC by default. However, to make
@@ -99,7 +100,8 @@ public class CronetApplication extends Application {
                 .build();
     }
 
-    private static void createCustomCronetEngine(Context context) {
+    // 国产手机适配需要走该分支
+    public static void createCustomCronetEngine(Context context) {
         // For most users of Cronet on modern devices it should be sufficient to just create
         // a CronetEngine.Builder directly, as demonstrated in createDefaultCronetEngine().
         // The implementation selects the "best" (the most recent) implementation of Cronet
@@ -125,8 +127,11 @@ public class CronetApplication extends Application {
                         } else if (cause instanceof GooglePlayServicesRepairableException) {
                             Toast.makeText(context, "Google Play services update is required.",
                                     Toast.LENGTH_SHORT).show();
-                            context.startActivity(((GooglePlayServicesRepairableException) cause)
-                                    .getIntent());
+                            Intent in =((GooglePlayServicesRepairableException) cause)
+                                    .getIntent();
+                            in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            Log.i(TAG,"intent:" +in.toString());
+                            context.startActivity(in);
                         } else {
                             Toast.makeText(context, "Unexpected error: " + cause,
                                     Toast.LENGTH_SHORT).show();
@@ -156,9 +161,11 @@ public class CronetApplication extends Application {
         // a random one.
         Collections.shuffle(enabledProviders);
         CronetProvider winner = enabledProviders.get(0);
-        Toast.makeText(context, "And the winning Cronet implementation is " + winner.getName() +
-                        ", version " + winner.getVersion(),
-                Toast.LENGTH_SHORT).show();
+        Log.d(TAG,"And the winning Cronet implementation is " + winner.getName() +
+                ", version " + winner.getVersion());
+//        Toast.makeText(context, "And the winning Cronet implementation is " + winner.getName() +
+//                        ", version " + winner.getVersion(),
+//                Toast.LENGTH_SHORT).show();
 
         // Then, one can use the provider to create a builder, and set it up as demonstrated
         // in createDefaultCronetEngine.
