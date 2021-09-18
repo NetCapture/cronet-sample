@@ -144,7 +144,10 @@ public class Fa extends Activity {
 
 
     public static String getImage() {
-        int index = new Random(System.nanoTime()).nextInt(imageUrls.length - 1);
-        return imageUrls[index];
+        return "https://storage.googleapis.com/cronet/walnut.jpg";
     }
+//    public static String getImage() {
+//        int index = new Random(System.nanoTime()).nextInt(imageUrls.length - 1);
+//        return imageUrls[index];
+//    }
 }

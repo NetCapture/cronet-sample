@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">Cronet-sample</string>
+    <string name="app_name">Google-Cronet</string>
 
     <string name="storage_permission_denied">Permission to access storage was denied</string>
     <string name="load_images">LOAD</string>

@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        applicationId "cn.qq.cronetdemo"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dexOptions {
+        preDexLibraries false
+        maxProcessCount 8
+        javaMaxHeapSize "4g"
+    }
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        warningsAsErrors false
+        disable "UnusedResources", 'RestrictedApi'
+        textOutput "stdout"
+        textReport false
+        check 'NewApi', 'InlinedApi'
+    }
+}
+dependencies {
+//    implementation files('libs/cronet_impl_common_java.jar')
+//    implementation files('libs/cronet_impl_native_java.jar')
+//    implementation files('libs/cronet_api.jar')
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation "com.google.android.gms:play-services-cronet:17.0.1"
+
+}
